@@ -75,6 +75,8 @@ for item in unique.items():
         challenge1 = item[0]
         break
 
+print("\"" + challenge1 + "\" is code for 13 words")
+
 # Challenge 2
 all_max_dashes = []
 for sequence in morse:
@@ -95,6 +97,8 @@ for index, max_dashes in enumerate(all_max_dashes):
         challenge2 = str(challenge2)
         break
 
+print("\"" + challenge2 + "\" in Morse has 15 consecutive dashes")
+
 # Challenge 3
 challenge3 = ''
 for index, word in enumerate(lines):
@@ -111,6 +115,8 @@ for index, word in enumerate(lines):
     if challenge3:
         break
 
+print("\"" + challenge3 + "\" is another perfectly-balanced word")
+
 # Challenge 4
 for word in lines:
     if len(word) == 13:
@@ -126,18 +132,48 @@ for word in lines:
             challenge4 = word.split().pop() # pop() to remove line break character at the end
             challenge4 = str(challenge4)
 
-# Challenge 5
-possible_sequences = [".", "-"]
-for sequence in possible_sequences:
-    sequence.append(".")
-    possible_sequences.append(sequence.append("-"))
-#for sequence in morse:
-
-
-# Print answers
-print("\"" + challenge1 + "\" is code for 13 words")
-print("\"" + challenge2 + "\" in Morse has 15 consecutive dashes")
-print("\"" + challenge3 + "\" is another perfectly-balanced word")
 print("\"" + challenge4 + "\" is the only 13-letter palindrome in Morse")
-print("\n" + len(possible_sequences) + " possible sequences were generated")
-#print(challenge5 + " do not appear in the list of translated words")
+
+# Challenge 5
+def generate_sequences(length, values):
+    current_sequences = values
+    for n in range(1, length):
+        current_sequences = add_dimension(current_sequences, values)
+    return current_sequences
+
+def add_dimension(current_sequences, values_to_add):
+    new_sequences = []
+    for sequence in current_sequences:
+        for value in values_to_add:
+            new_sequences.append(sequence + value)
+    return new_sequences
+
+# Generate all possible sequences
+possible_sequences = generate_sequences(13, [".","-"])
+print("\n" + str(len(possible_sequences)) + " possible sequences were generated")
+
+def is_sublist(sublist, superlist):
+    i = 0
+    for index, sp in enumerate(superlist):
+        if i == 0 and len(superlist) - index < len(sublist):
+            return False
+        if sublist[i] == sp:
+            if i == len(sublist) - 1:
+                return True
+            i += 1
+        else:
+            i = 0
+
+# Isolate non-occurring sequences
+challenge5 = []
+for si, sequence in enumerate(morse):
+    count = 0
+    for mi, morseline in enumerate(possible_sequences):
+        if is_sublist(sequence, morseline):
+            count += 1
+        rows_processed = 100 * (((mi + 1) * len(possible_sequences)) + si + 1) / (len(morse) * len(possible_sequences))
+        sys.stdout.write(str(round(rows_processed, 4)) + "%, " + str(len(challenge5)) + " solutions found")
+    if count == 0:
+        challenge5.append(sequence)
+
+print(challenge5 + " do not appear in the list of translated words")
